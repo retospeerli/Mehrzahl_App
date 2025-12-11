@@ -1,0 +1,821 @@
+<!DOCTYPE html>
+<html lang="de">
+<head>
+  <meta charset="UTF-8">
+  <title>Mehrzahl-Training – Pluralformen</title>
+  <style>
+    :root {
+      font-family: system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
+      background: #e5e7eb;
+    }
+    body {
+      margin: 0;
+      min-height: 100vh;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+    }
+    .app {
+      background: #ffffff;
+      border-radius: 18px;
+      box-shadow: 0 10px 30px rgba(0,0,0,0.12);
+      padding: 2rem 2.5rem;
+      max-width: 780px;
+      width: 100%;
+      box-sizing: border-box;
+    }
+    h1 {
+      margin-top: 0;
+      text-align: center;
+      font-size: 1.8rem;
+    }
+    .subtitle {
+      text-align: center;
+      color: #4b5563;
+      margin-bottom: 1.2rem;
+      font-size: 0.95rem;
+    }
+    .center { text-align: center; }
+
+    .section-title {
+      font-size: 0.9rem;
+      font-weight: 600;
+      text-transform: uppercase;
+      letter-spacing: 0.06em;
+      color: #6b7280;
+      margin-top: 0.4rem;
+      margin-bottom: 0.2rem;
+    }
+
+    .choice-grid {
+      display: grid;
+      grid-template-columns: repeat(2, minmax(0, 1fr));
+      gap: 0.6rem;
+      margin-bottom: 0.6rem;
+    }
+    .choice-btn {
+      padding: 0.8rem 0.6rem;
+      border-radius: 14px;
+      border: 2px solid #d1d5db;
+      background: #f9fafb;
+      font-size: 0.95rem;
+      font-weight: 600;
+      cursor: pointer;
+      transition: background 0.15s ease, transform 0.05s ease,
+                  border-color 0.15s ease, box-shadow 0.15s ease;
+    }
+    .choice-btn.selected {
+      background: #2563eb;
+      color: #ffffff;
+      border-color: #1d4ed8;
+      box-shadow: 0 5px 15px rgba(37,99,235,0.35);
+    }
+    .choice-btn:active { transform: translateY(1px); }
+
+    .selected-info {
+      font-size: 0.85rem;
+      color: #6b7280;
+      text-align: center;
+      min-height: 1.2rem;
+      margin-bottom: 0.5rem;
+    }
+
+    .primary-btn {
+      margin-top: 0.9rem;
+      width: 100%;
+      padding: 0.7rem 1rem;
+      font-size: 1.05rem;
+      border-radius: 999px;
+      border: none;
+      cursor: pointer;
+      background: #2563eb;
+      color: white;
+      font-weight: 600;
+      transition: transform 0.05s ease, box-shadow 0.05s ease, background 0.2s ease;
+    }
+    .primary-btn:hover { background: #1d4ed8; }
+    .primary-btn:active {
+      transform: translateY(1px);
+      box-shadow: 0 2px 6px rgba(0,0,0,0.2);
+    }
+    .primary-btn:disabled {
+      background: #9ca3af;
+      cursor: not-allowed;
+      box-shadow: none;
+    }
+
+    .secondary-btn {
+      margin-top: 0.4rem;
+      width: 100%;
+      padding: 0.6rem 1rem;
+      font-size: 1rem;
+      border-radius: 999px;
+      border: 1px solid #d1d5db;
+      cursor: pointer;
+      background: #f9fafb;
+      color: #111827;
+      font-weight: 500;
+      transition: transform 0.05s ease, box-shadow 0.05s ease, background 0.2s ease, border-color 0.2s ease;
+    }
+    .secondary-btn:hover {
+      background: #e5e7eb;
+      border-color: #9ca3af;
+    }
+    .secondary-btn:active {
+      transform: translateY(1px);
+      box-shadow: 0 2px 6px rgba(0,0,0,0.15);
+    }
+
+    .hidden { display: none; }
+
+    /* Quizbereich */
+    .info-row {
+      display: flex;
+      justify-content: space-between;
+      font-size: 0.9rem;
+      color: #4b5563;
+      margin-top: 0.3rem;
+    }
+    .timer {
+      font-weight: 700;
+    }
+    .timer.low { color: #b91c1c; }
+
+    .word-display {
+      font-size: 2.6rem;
+      font-weight: 700;
+      margin: 1rem 0 0.8rem;
+      text-align: center;
+      letter-spacing: 0.04em;
+    }
+
+    .tagline {
+      font-size: 0.9rem;
+      text-align: center;
+      color: #6b7280;
+      margin-top: 0.2rem;
+    }
+
+    .option-grid {
+      margin-top: 0.8rem;
+      display: grid;
+      grid-template-columns: repeat(3, minmax(0, 1fr));
+      gap: 0.6rem;
+    }
+    .option-btn {
+      padding: 0.7rem 0.5rem;
+      border-radius: 14px;
+      border: 2px solid #d1d5db;
+      background: #f9fafb;
+      font-size: 1.1rem;
+      font-weight: 600;
+      cursor: pointer;
+      transition: background 0.15s ease, transform 0.05s ease,
+                  border-color 0.15s ease, box-shadow 0.15s ease;
+      text-align: center;
+      color: #111827;
+      word-wrap: break-word;
+    }
+    .option-btn:hover {
+      background: #e5e7eb;
+    }
+    .option-btn:active {
+      transform: translateY(1px);
+      box-shadow: 0 2px 6px rgba(0,0,0,0.15);
+    }
+
+    .feedback {
+      min-height: 1.4rem;
+      margin-top: 0.6rem;
+      font-weight: 500;
+      text-align: center;
+    }
+    .feedback.ok { color: #15803d; }
+    .feedback.error { color: #b91c1c; }
+
+    .stats {
+      margin-top: 0.6rem;
+      font-size: 0.9rem;
+      color: #374151;
+    }
+
+    /* Arena / Ringkampf */
+    .arena-wrapper {
+      margin-top: 1rem;
+      padding: 0.8rem;
+      border-radius: 14px;
+      background: #f3f4f6;
+      border: 1px solid #e5e7eb;
+    }
+    .arena-header {
+      display: flex;
+      justify-content: space-between;
+      font-size: 0.9rem;
+      margin-bottom: 0.35rem;
+    }
+    .score {
+      font-weight: 600;
+    }
+    .arena {
+      display: grid;
+      grid-template-columns: auto 1fr auto;
+      align-items: center;
+      gap: 0.6rem;
+    }
+    .fighter {
+      font-size: 2.1rem;
+    }
+    .track {
+      display: grid;
+      grid-template-columns: repeat(9, minmax(0, 1fr));
+      gap: 0.12rem;
+      align-items: center;
+    }
+    .track-cell {
+      height: 14px;
+      border-radius: 999px;
+      background: #e5e7eb;
+      position: relative;
+    }
+    .track-cell.mid {
+      background: #d1d5db;
+    }
+    .marker {
+      position: absolute;
+      top: -6px;
+      left: 50%;
+      transform: translateX(-50%);
+      width: 18px;
+      height: 18px;
+      border-radius: 50%;
+      background: #fbbf24;
+      box-shadow: 0 0 0 2px rgba(0,0,0,0.08);
+    }
+
+    #result-screen h2 {
+      margin-bottom: 0.3rem;
+    }
+    #result-summary {
+      font-size: 0.95rem;
+      color: #374151;
+    }
+  </style>
+</head>
+<body>
+<div class="app">
+  <h1>Mehrzahl-Training – Pluralformen</h1>
+  <div class="subtitle">
+    Finde die richtige Mehrzahlform zu den Singularwörtern.<br>
+    Training ohne Timer oder als Wettkampf gegen den Roboter.
+  </div>
+
+  <!-- STARTSCREEN -->
+  <div id="start-screen">
+    <div class="section-title">Modus wählen</div>
+    <div class="choice-grid" id="mode-grid">
+      <button type="button" class="choice-btn mode-btn" data-mode="training">
+        Training (ohne Timer, ohne Wettkampf)
+      </button>
+      <button type="button" class="choice-btn mode-btn" data-mode="t3">
+        Wettkampf – 3&nbsp;s pro Wort
+      </button>
+      <button type="button" class="choice-btn mode-btn" data-mode="t5">
+        Wettkampf – 5&nbsp;s pro Wort
+      </button>
+      <button type="button" class="choice-btn mode-btn" data-mode="t10">
+        Wettkampf – 10&nbsp;s pro Wort
+      </button>
+    </div>
+
+    <div class="selected-info" id="selected-info"></div>
+    <button class="primary-btn" id="start-btn" disabled>Los geht's!</button>
+  </div>
+
+  <!-- QUIZSCREEN -->
+  <div id="quiz-screen" class="hidden">
+    <div class="info-row">
+      <div id="mode-label"></div>
+      <div class="timer" id="timer-display"></div>
+    </div>
+
+    <div class="word-display" id="word-display">Baum</div>
+    <div class="tagline">Klicke die richtige Mehrzahl zu diesem Wort an.</div>
+
+    <div class="option-grid" id="options-container">
+      <!-- Buttons werden dynamisch eingefügt -->
+    </div>
+
+    <div class="feedback" id="feedback"></div>
+
+    <div class="stats">
+      Wörter gelöst: <span id="stat-questions">0</span><br>
+      Richtig: <span id="stat-correct">0</span>, Falsch: <span id="stat-wrong">0</span><br>
+      Wettkampf-Punkte (nur im Wettkampf):<br>
+      Du: <span id="stat-player">0</span> – Roboter: <span id="stat-pc">0</span>
+    </div>
+
+    <div class="arena-wrapper" id="arena-wrapper">
+      <div class="arena-header">
+        <div class="score" id="score-text">0 : 0</div>
+        <div style="font-size:0.85rem;color:#6b7280;">
+          Richtig: ein Schritt nach rechts<br>
+          Falsch / Zeit abgelaufen: ein Schritt nach links<br>
+          4 Schritte = 1 Punkt
+        </div>
+      </div>
+      <div class="arena">
+        <div class="fighter">🤖</div>
+        <div class="track" id="track"></div>
+        <div class="fighter">🧑‍🎓</div>
+      </div>
+    </div>
+  </div>
+
+  <!-- RESULTSCREEN -->
+  <div id="result-screen" class="hidden center">
+    <h2 id="result-title">Fertig!</h2>
+    <p id="result-summary"></p>
+    <p style="margin-top:0.8rem; font-size:0.9rem; color:#4b5563;">
+      Wenn du mit deinem Wettkampf zufrieden bist, klicke auf <strong>„Fertig“</strong>,<br>
+      damit LearningView den Auftrag als erledigt markiert.<br>
+      Mit <strong>„Nochmals spielen“</strong> kannst du einen neuen Kampf starten.
+    </p>
+    <button class="primary-btn" id="finish-btn">Fertig</button>
+    <button class="secondary-btn" id="again-btn">Nochmals spielen</button>
+  </div>
+</div>
+
+<!-- Audio-WAV-Dateien im Ordner audio/ -->
+<audio id="sound-correct"   src="audio/correct.wav"   preload="auto"></audio>
+<audio id="sound-error"     src="audio/error.wav"     preload="auto"></audio>
+<audio id="sound-roundwon"  src="audio/roundwon.wav"  preload="auto"></audio>
+<audio id="sound-roundlost" src="audio/roundlost.wav" preload="auto"></audio>
+<audio id="sound-gamewon"   src="audio/gamewon.wav"   preload="auto"></audio>
+<audio id="sound-youwon"    src="audio/youwon.wav"    preload="auto"></audio>
+<audio id="sound-gamelost"  src="audio/gamelost.wav"  preload="auto"></audio>
+
+<script>
+  // --- Konfiguration ---
+  const STEP_WIN = 4;      // 4 Schritte nach links/rechts = Punkt
+  const POINTS_TO_WIN = 3; // 3 Punkte = Spielende
+
+  const TIME_LIMITS = {
+    t3: 3,
+    t5: 5,
+    t10: 10
+  };
+
+  // --- Wortliste Mehrzahl ---
+  const WORD_LIST = [
+    // Umlaut-Regeln a->ä (phonetische Fehler)
+    { singular: "Baum",   plural: "Bäume",   wrong1: "Beume",   wrong2: "Boime" },
+    { singular: "Haus",   plural: "Häuser", wrong1: "Heuser",  wrong2: "Hoiser" },
+    { singular: "Maus",   plural: "Mäuse",  wrong1: "Meuse",   wrong2: "Moise" },
+    { singular: "Garten", plural: "Gärten", wrong1: "Gerten",  wrong2: "Garten" },
+    { singular: "Gast",   plural: "Gäste",  wrong1: "Geste",   wrong2: "Gaste" },
+    { singular: "Ball",   plural: "Bälle",  wrong1: "Belle",   wrong2: "Balle" },
+    { singular: "Bach",   plural: "Bäche",  wrong1: "Beche",   wrong2: "Bache" },
+    { singular: "Dach",   plural: "Dächer", wrong1: "Decher",  wrong2: "Döcher" },
+    { singular: "Schrank",plural: "Schränke",wrong1: "Schrenke",wrong2: "Schranke" },
+    { singular: "Kran",   plural: "Kräne",  wrong1: "Krene",   wrong2: "Krane" },
+
+    // Umlaut-Regeln o->ö
+    { singular: "Sohn",   plural: "Söhne",  wrong1: "Sehne",   wrong2: "Sohne" },
+    { singular: "Gott",   plural: "Götter", wrong1: "Getter",  wrong2: "Gotter" },
+    { singular: "Hof",    plural: "Höfe",   wrong1: "Hefe",    wrong2: "Hofe" },
+    { singular: "Vogel",  plural: "Vögel",  wrong1: "Vegel",   wrong2: "Vogels" },
+    { singular: "Wort",   plural: "Wörter", wrong1: "Worter",  wrong2: "Wörters" },
+    { singular: "Brot",   plural: "Brote",  wrong1: "Bröte",   wrong2: "Bröter" },
+    { singular: "Stock",  plural: "Stöcke", wrong1: "Stecke",  wrong2: "Stocke" },
+    { singular: "Knopf",  plural: "Knöpfe", wrong1: "Kneppe",  wrong2: "Knoippe" },
+    { singular: "Topf",   plural: "Töpfe",  wrong1: "Tepfe",   wrong2: "Topfe" },
+    { singular: "Boden",  plural: "Böden",  wrong1: "Beden",   wrong2: "Boden" },
+
+    // Umlaut-Regeln u->ü
+    { singular: "Mutter",  plural: "Mütter",  wrong1: "Mutter",  wrong2: "Mutters" },
+    { singular: "Vater",   plural: "Väter",   wrong1: "Vater",   wrong2: "Vaters" },
+    { singular: "Tochter", plural: "Töchter", wrong1: "Tochter", wrong2: "Tochters" },
+    { singular: "Bruder",  plural: "Brüder",  wrong1: "Bruder",  wrong2: "Bruider" },
+    { singular: "Hut",     plural: "Hüte",    wrong1: "Hute",    wrong2: "Huts" },
+    { singular: "Kuh",     plural: "Kühe",    wrong1: "Kuhe",    wrong2: "Küe" },
+    { singular: "Fluss",   plural: "Flüsse",  wrong1: "Flusse",  wrong2: "Flisse" },
+    { singular: "Schuh",   plural: "Schuhe",  wrong1: "Schue",   wrong2: "Schuhs" },
+    { singular: "Buch",    plural: "Bücher",  wrong1: "Büächer", wrong2: "Buchen" },
+    { singular: "Fuss",    plural: "Füsse",   wrong1: "Fusse",   wrong2: "Fuise" },
+
+    // Au/äu-Regeln
+    { singular: "Braut",  plural: "Bräute",  wrong1: "Breute",  wrong2: "Broite" },
+    { singular: "Traum",  plural: "Träume",  wrong1: "Treume",  wrong2: "Troime" },
+    { singular: "Raum",   plural: "Räume",   wrong1: "Reume",   wrong2: "Roime" },
+    { singular: "Sau",    plural: "Säue",    wrong1: "Seue",    wrong2: "Soie" },
+    { singular: "Frau",   plural: "Frauen",  wrong1: "Freuen",  wrong2: "Fraus" },
+    { singular: "Mauer",  plural: "Mauern",  wrong1: "Meuern",  wrong2: "Moiern" },
+
+    // Eu-Wörter
+    { singular: "Scheune", plural: "Scheunen", wrong1: "Schäunen", wrong2: "Scheune" },
+    { singular: "Freude",  plural: "Freuden",  wrong1: "Fröiden",  wrong2: "Froiden" },
+    { singular: "Feuer",   plural: "Feuer",    wrong1: "Fäuer",    wrong2: "Feuers" },
+    { singular: "Leute",   plural: "Leute",    wrong1: "Läute",    wrong2: "Leuten" },
+
+    // Sonderfälle
+    { singular: "Museum",  plural: "Museen",   wrong1: "Museümer", wrong2: "Museums" },
+    { singular: "Studium", plural: "Studien",  wrong1: "Studiümer",wrong2: "Studiumse" },
+    { singular: "Zentrum", plural: "Zentren",  wrong1: "Zentrumen",wrong2: "Zentrums" },
+    { singular: "Datum",   plural: "Daten",    wrong1: "Datümer",  wrong2: "Datums" },
+    { singular: "Thema",   plural: "Themen",   wrong1: "Themas",   wrong2: "Thema" },
+
+    // Keine Umlaute
+    { singular: "Tasche",  plural: "Taschen",  wrong1: "Täschen",  wrong2: "Tasches" },
+    { singular: "Lampe",   plural: "Lampen",   wrong1: "Lämpen",   wrong2: "Lampens" },
+    { singular: "Flasche", plural: "Flaschen", wrong1: "Fläschen", wrong2: "Flösche" },
+    { singular: "Kanne",   plural: "Kannen",   wrong1: "Kännen",   wrong2: "Känne" },
+    { singular: "Karte",   plural: "Karten",   wrong1: "Kärten",   wrong2: "Kartens" },
+
+    { singular: "Fenster", plural: "Fenster",  wrong1: "Fenster",  wrong2: "Fenstern" },
+    { singular: "Bett",    plural: "Betten",   wrong1: "Bätten",   wrong2: "Bett" },
+    { singular: "Brett",   plural: "Bretter",  wrong1: "Brätter",  wrong2: "Brettär" },
+    { singular: "Blatt",   plural: "Blätter",  wrong1: "Bletter",  wrong2: "Blatter" }
+  ];
+
+  // --- Zustand ---
+  let selectedMode = null;    // 'training', 't3', 't5', 't10'
+  let isTrainingMode = false;
+
+  let timeLimit = 0;
+  let timeLeft = 0;
+  let timerId = null;
+
+  let currentItem = null;     // aktuelles {singular, plural, wrong1, wrong2}
+  let currentOptions = [];    // Array mit Strings (Pluralformen)
+  let correctOption = "";     // der richtige Plural
+
+  let position = 0;      // -4..+4, 0 = Mitte
+  let playerPoints = 0;
+  let pcPoints = 0;
+  let questionsCount = 0;
+  let correctCount = 0;
+  let wrongCount = 0;
+
+  let gameOver = false;
+
+  // --- DOM ---
+  const startScreen = document.getElementById("start-screen");
+  const quizScreen = document.getElementById("quiz-screen");
+  const resultScreen = document.getElementById("result-screen");
+
+  const modeGrid = document.getElementById("mode-grid");
+  const selectedInfo = document.getElementById("selected-info");
+  const startBtn = document.getElementById("start-btn");
+
+  const modeLabel = document.getElementById("mode-label");
+  const timerDisplay = document.getElementById("timer-display");
+  const wordDisplay = document.getElementById("word-display");
+  const optionsContainer = document.getElementById("options-container");
+  const feedbackEl = document.getElementById("feedback");
+
+  const statQuestions = document.getElementById("stat-questions");
+  const statCorrect = document.getElementById("stat-correct");
+  const statWrong = document.getElementById("stat-wrong");
+  const statPlayer = document.getElementById("stat-player");
+  const statPc = document.getElementById("stat-pc");
+  const scoreText = document.getElementById("score-text");
+  const trackEl = document.getElementById("track");
+  const arenaWrapper = document.getElementById("arena-wrapper");
+
+  const resultTitle = document.getElementById("result-title");
+  const resultSummary = document.getElementById("result-summary");
+  const finishBtn = document.getElementById("finish-btn");
+  const againBtn = document.getElementById("again-btn");
+
+  // --- Audio-Helfer ---
+  function playSound(id) {
+    const el = document.getElementById(id);
+    if (!el) return;
+    try {
+      el.currentTime = 0;
+      el.play().catch(() => {});
+    } catch (e) {
+      console.warn("Audio-Fehler:", e);
+    }
+  }
+
+  // Anzeige: ß -> ss, erster Buchstabe groß
+  function displayForm(raw) {
+    if (!raw) return "";
+    let w = raw;
+    w = w.replace(/ß/g, "ss");
+    if (w.length > 0) {
+      w = w.charAt(0).toUpperCase() + w.slice(1);
+    }
+    return w;
+  }
+
+  // --- Modus-Auswahl ---
+  modeGrid.querySelectorAll(".mode-btn").forEach(btn => {
+    btn.addEventListener("click", () => {
+      const m = btn.dataset.mode;
+      selectedMode = (selectedMode === m) ? null : m;
+      modeGrid.querySelectorAll(".mode-btn").forEach(b => {
+        b.classList.toggle("selected", b.dataset.mode === selectedMode);
+      });
+      updateStartState();
+    });
+  });
+
+  function updateStartState() {
+    if (!selectedMode) {
+      selectedInfo.textContent = "Bitte einen Modus auswählen.";
+      startBtn.disabled = true;
+      return;
+    }
+    let modeText = "";
+    if (selectedMode === "training") {
+      modeText = "Training ohne Timer und ohne Wettkampf";
+    } else if (selectedMode === "t3") {
+      modeText = "Wettkampf mit 3 Sekunden pro Wort";
+    } else if (selectedMode === "t5") {
+      modeText = "Wettkampf mit 5 Sekunden pro Wort";
+    } else if (selectedMode === "t10") {
+      modeText = "Wettkampf mit 10 Sekunden pro Wort";
+    }
+    selectedInfo.textContent = modeText;
+    startBtn.disabled = false;
+  }
+
+  startBtn.addEventListener("click", startGame);
+
+  function startGame() {
+    isTrainingMode = (selectedMode === "training");
+    gameOver = false;
+
+    questionsCount = 0;
+    correctCount = 0;
+    wrongCount = 0;
+    position = 0;
+    playerPoints = 0;
+    pcPoints = 0;
+
+    if (isTrainingMode) {
+      arenaWrapper.classList.add("hidden");
+      timerDisplay.textContent = "Kein Timer (Training)";
+    } else {
+      arenaWrapper.classList.remove("hidden");
+      timeLimit = TIME_LIMITS[selectedMode] || 10;
+    }
+
+    updateStats();
+    buildTrack();
+    updateTrack();
+
+    feedbackEl.textContent = "";
+    feedbackEl.className = "feedback";
+
+    let modeText = "";
+    if (isTrainingMode) modeText = "Training: Mehrzahl ohne Timer";
+    else if (selectedMode === "t3") modeText = "Wettkampf: 3 Sekunden pro Wort";
+    else if (selectedMode === "t5") modeText = "Wettkampf: 5 Sekunden pro Wort";
+    else if (selectedMode === "t10") modeText = "Wettkampf: 10 Sekunden pro Wort";
+    modeLabel.textContent = modeText;
+
+    startScreen.classList.add("hidden");
+    resultScreen.classList.add("hidden");
+    quizScreen.classList.remove("hidden");
+
+    nextQuestion();
+  }
+
+  // --- Hilfsfunktionen ---
+  function randInt(min, max) {
+    return Math.floor(Math.random() * (max - min + 1)) + min;
+  }
+
+  function shuffleArray(arr) {
+    for (let i = arr.length - 1; i > 0; i--) {
+      const j = randInt(0, i);
+      [arr[i], arr[j]] = [arr[j], arr[i]];
+    }
+    return arr;
+  }
+
+  function nextQuestion() {
+    if (gameOver) return;
+
+    feedbackEl.textContent = "";
+    feedbackEl.className = "feedback";
+
+    const idx = randInt(0, WORD_LIST.length - 1);
+    currentItem = WORD_LIST[idx];
+
+    wordDisplay.textContent = displayForm(currentItem.singular);
+
+    const options = [currentItem.plural, currentItem.wrong1, currentItem.wrong2];
+    shuffleArray(options);
+    currentOptions = options;
+    correctOption = currentItem.plural;
+
+    renderOptions();
+
+    if (!isTrainingMode) {
+      resetTimer();
+    }
+  }
+
+  function renderOptions() {
+    optionsContainer.innerHTML = "";
+    currentOptions.forEach(opt => {
+      const btn = document.createElement("button");
+      btn.type = "button";
+      btn.className = "option-btn";
+      btn.textContent = displayForm(opt);
+      btn.dataset.value = opt;
+      btn.addEventListener("click", () => {
+        handleAnswer(opt, false);
+      });
+      optionsContainer.appendChild(btn);
+    });
+  }
+
+  // --- Timer ---
+  function resetTimer() {
+    if (timerId) clearInterval(timerId);
+    timeLeft = timeLimit;
+    updateTimerUI();
+
+    timerId = setInterval(() => {
+      timeLeft--;
+      updateTimerUI();
+      if (timeLeft <= 0) {
+        clearInterval(timerId);
+        timerId = null;
+        handleAnswer(null, true);
+      }
+    }, 1000);
+  }
+
+  function updateTimerUI() {
+    if (isTrainingMode) {
+      timerDisplay.textContent = "Kein Timer (Training)";
+      timerDisplay.classList.remove("low");
+      return;
+    }
+    timerDisplay.textContent = `Restzeit: ${timeLeft}s`;
+    timerDisplay.classList.toggle("low", timeLeft <= 2);
+  }
+
+  // --- Arena / Marker ---
+  function buildTrack() {
+    trackEl.innerHTML = "";
+    for (let i = 0; i < 9; i++) {
+      const cell = document.createElement("div");
+      cell.className = "track-cell";
+      if (i === 4) cell.classList.add("mid");
+      trackEl.appendChild(cell);
+    }
+  }
+
+  function updateTrack() {
+    const cells = trackEl.querySelectorAll(".track-cell");
+    cells.forEach(c => {
+      const marker = c.querySelector(".marker");
+      if (marker) c.removeChild(marker);
+    });
+    const idx = position + 4; // -4..+4 -> 0..8
+    if (idx >= 0 && idx < cells.length) {
+      const marker = document.createElement("div");
+      marker.className = "marker";
+      cells[idx].appendChild(marker);
+    }
+    scoreText.textContent = `${playerPoints} : ${pcPoints}`;
+  }
+
+  function updateStats() {
+    statQuestions.textContent = questionsCount.toString();
+    statCorrect.textContent = correctCount.toString();
+    statWrong.textContent = wrongCount.toString();
+    statPlayer.textContent = playerPoints.toString();
+    statPc.textContent = pcPoints.toString();
+  }
+
+  // --- Antwort-Handling ---
+  function handleAnswer(chosenValue, isTimeout) {
+    if (gameOver) return;
+
+    if (!isTrainingMode && timerId) {
+      clearInterval(timerId);
+      timerId = null;
+    }
+
+    questionsCount++;
+
+    const isCorrect = (!isTimeout && chosenValue === correctOption);
+
+    if (isCorrect) {
+      correctCount++;
+      feedbackEl.textContent = "Richtig! 👍";
+      feedbackEl.className = "feedback ok";
+      playSound("sound-correct");
+    } else {
+      wrongCount++;
+      feedbackEl.textContent = isTimeout
+        ? "Zeit abgelaufen – das war leider falsch."
+        : "Leider falsch.";
+      feedbackEl.className = "feedback error";
+      playSound("sound-error");
+    }
+
+    if (isTrainingMode) {
+      updateStats();
+      setTimeout(() => {
+        nextQuestion();
+      }, 800);
+      return;
+    }
+
+    // Wettkampf-Logik
+    if (isCorrect) {
+      position = Math.min(position + 1, STEP_WIN);
+    } else {
+      position = Math.max(position - 1, -STEP_WIN);
+    }
+
+    if (position >= STEP_WIN) {
+      playerPoints++;
+      position = 0;
+      feedbackEl.textContent += " Du gewinnst eine Runde!";
+      feedbackEl.className = "feedback ok";
+      playSound("sound-roundwon");
+    } else if (position <= -STEP_WIN) {
+      pcPoints++;
+      position = 0;
+      feedbackEl.textContent += " Der Roboter gewinnt eine Runde.";
+      feedbackEl.className = "feedback error";
+      playSound("sound-roundlost");
+    }
+
+    updateTrack();
+    updateStats();
+
+    if (playerPoints >= POINTS_TO_WIN || pcPoints >= POINTS_TO_WIN) {
+      setTimeout(endGame, 700);
+    } else {
+      setTimeout(() => {
+        nextQuestion();
+      }, 800);
+    }
+  }
+
+  function endGame() {
+    gameOver = true;
+    if (timerId) clearInterval(timerId);
+
+    quizScreen.classList.add("hidden");
+    resultScreen.classList.remove("hidden");
+
+    const win = playerPoints > pcPoints;
+    if (win) {
+      resultTitle.textContent = "Sieg im Plural-Kampf! 🎉";
+      playSound("sound-gamewon");
+      setTimeout(() => {
+        playSound("sound-youwon");
+      }, 700);
+    } else {
+      resultTitle.textContent = "Der Roboter gewinnt 😕";
+      playSound("sound-gamelost");
+    }
+
+    resultSummary.innerHTML =
+      `Du hast insgesamt <strong>${questionsCount}</strong> Wörter gelöst.<br>` +
+      `Davon waren <strong>${correctCount}</strong> richtig und <strong>${wrongCount}</strong> falsch.<br>` +
+      `Wettkampf-Punkte: <strong>Du ${playerPoints}</strong> – <strong>Roboter ${pcPoints}</strong>.`;
+
+    finishBtn.disabled = false;
+    finishBtn.textContent = "Fertig";
+  }
+
+  // LearningView-Feedback
+  finishBtn.addEventListener("click", () => {
+    finishBtn.disabled = true;
+    finishBtn.textContent = "Erledigt ✔";
+    try {
+      if (window.parent && window.parent !== window) {
+        window.parent.postMessage("AppSolved", "*");
+      }
+    } catch (e) {
+      console.warn("LearningView-AppSolved nicht möglich:", e);
+    }
+  });
+
+  againBtn.addEventListener("click", () => {
+    resultScreen.classList.add("hidden");
+    startScreen.classList.remove("hidden");
+  });
+
+  // --- Init ---
+  (function init() {
+    buildTrack();
+    updateTrack();
+    updateStartState();
+  })();
+</script>
+</body>
+</html>
